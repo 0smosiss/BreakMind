@@ -1,6 +1,6 @@
-﻿#include "Ahorcado.h"
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include "Ahorcado.h"
 #include <fstream>
-#include <cctype>
 
 // Constructor
 Ahorcado::Ahorcado(string nombre, bool modo) : Juego(nombre) {
@@ -135,12 +135,11 @@ void Ahorcado::mostrarResultado() {
 void Ahorcado::guardarPartida() {
     ofstream archivo("historial.txt", ios::app);
     if (archivo.is_open()) {
-        std::time_t t = std::time(nullptr);
-        std::tm local = {};
-        localtime_s(&local, &t);  
+        time_t t = time(nullptr);
 
+        struct tm* timeinfo = localtime(&t);
         char fecha[11];
-        std::strftime(fecha, sizeof(fecha), "%Y-%m-%d", &local);
+        strftime(fecha, sizeof(fecha), "%Y-%m-%d", timeinfo);
 
         archivo << fecha << " " << nombreJugador << " AH ";
         archivo << (juegoGanado ? "G" : "P") << " ";
@@ -206,25 +205,37 @@ void Ahorcado::agregarLetraUsada(char letra) {
 }
 
 void Ahorcado::cargarPalabras() {
-    string palabras[] = {
-        "programacion", "computadora", "juego", "ahorcado", "universidad",
-        "algoritmo", "variable", "funcion", "compilador", "depurador",
-        "framework", "biblioteca", "interfaz", "desarrollo", "software",
-        "hardware", "sistema", "aplicacion", "navegador", "servidor",
-        "cliente", "protocolo", "encriptacion", "java", "python",
-        "javascript", "html", "css", "base", "datos",
-        "red", "internet", "web", "codigo", "programa",
-        "error", "debug", "test", "git", "github",
-        "api", "url", "http", "json", "xml",
-        "sql", "mysql", "mongodb", "linux", "windows",
-        "android", "ios", "mobile", "app", "frontend",
-        "backend", "fullstack", "devops", "cloud", "aws",
-        "azure", "docker", "kubernetes", "microservicio", "agile"
-    };
-    int numPalabras = 60;
-    // Selección "aleatoria" simple
-    int indice = numLetrasUsadas % numPalabras;
-    establecerPalabra(palabras[indice]);
+    ifstream archivo("palabras.txt");
+    vector<string> listaPalabras;
+    string linea;
+
+    if (!archivo.is_open()) {
+        cerr << "Error: No se pudo abrir el archivo de palabras." << endl;
+        establecerPalabra("palabra"); // Palabra por defecto
+        return;
+    }
+
+    while (getline(archivo, linea)) {
+        if (!linea.empty()) {
+            // Convertir a minusculas
+            for (char& c : linea) {
+                c = tolower(c);
+            }
+            listaPalabras.push_back(linea);
+        }
+    }
+
+    archivo.close();
+
+    if (listaPalabras.empty()) {
+        cerr << "Error: El archivo de palabras esta vacio." << endl;
+        establecerPalabra("palabra");
+    }
+    else {
+        // Generar indice aleatorio real
+        int indice = rand() % listaPalabras.size();
+        establecerPalabra(listaPalabras[indice]);
+    }
 }
 
 void Ahorcado::dibujarAhorcado() {

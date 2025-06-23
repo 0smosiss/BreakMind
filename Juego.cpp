@@ -1,6 +1,6 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "Juego.h"
 #include <fstream>
-#include <format>
 
 // Constructor
 Juego::Juego(string nombre) {
@@ -18,15 +18,11 @@ Juego::~Juego() {
 void Juego::guardarPartida() {
     ofstream archivo("historial.txt", ios::app);
     if (archivo.is_open()) {
-
-        time_t t = std::time(nullptr);
-        tm local = {};
-        localtime_s(&local, &t);
-
+        time_t t = time(nullptr);
+        // FUNCION COMUN PARA SACAR LA FECHA LOCAL DEL PC
+        struct tm* timeinfo = localtime(&t);
         char fecha[11];
-        std::strftime(fecha, sizeof(fecha), "%Y-%m-%d", &local);
-
-//FUNCION COMUN PARA SACAR LA FECHA LOCAL DEL PC
+        strftime(fecha, sizeof(fecha), "%Y-%m-%d", timeinfo);
 
         archivo << fecha << " " << nombreJugador << " ";
         archivo << (juegoGanado ? "G" : "P") << " ";

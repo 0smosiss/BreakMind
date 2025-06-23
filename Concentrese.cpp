@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "Concentrese.h"
 #include <fstream>
 
@@ -172,23 +173,16 @@ void Concentrese::guardarPartida() {
     ofstream archivo("historial.txt", ios::app);
     if (archivo.is_open()) {
         // usamos esta funcion usada comunmente para sacar la fecha local del pc 
-        
+
         // Obtenemos el tiempo actual del sistema
         time_t t = time(nullptr);
-
-        // Creamos una estructura para almacenar la fecha/hora local
-        tm local = {};
-
-        // Convertimos el tiempo UTC a tiempo local de forma segura
-        localtime_s(&local, &t);
-
+        // Convertimos el tiempo UTC a tiempo local de forma portable
+        struct tm* timeinfo = localtime(&t);
         // Buffer para almacenar la fecha formateada como string
         char fecha[11];
-
         // Formatear la fecha como "YYYY-MM-DD" (ejemplo: "2024-12-22")
-        strftime(fecha, sizeof(fecha), "%Y-%m-%d", &local);
-
-        archivo << fecha << "" << nombreJugador << " MEM ";
+        strftime(fecha, sizeof(fecha), "%Y-%m-%d", timeinfo);
+        archivo << fecha << " " << nombreJugador << " MEM ";
         archivo << (juegoGanado ? "G" : "P") << " ";
         archivo << puntuacion << endl;
         archivo.close();
