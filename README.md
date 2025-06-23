@@ -11,9 +11,7 @@ Este proyecto es una aplicación de consola en C++ que implementa dos minijuegos
 - Estructura del proyecto
 - Persistencia
 - Principios POO aplicados
-- Mejoras futuras
-- Autor
-- Licencia
+
 
 ## Características
 
